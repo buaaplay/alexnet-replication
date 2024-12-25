@@ -11,7 +11,6 @@ import config
 import os
 from utils.test_utils import evaluate
 
-# ====== 新增: 命令行超参数解析 ======
 def parse_args():
     parser = argparse.ArgumentParser(description="Train AlexNet on CIFAR-10 with minimal changes")
     parser.add_argument("--lr", type=float, default=None, help="Learning rate")
@@ -25,12 +24,10 @@ def parse_args():
     parser.add_argument("--exp-name", type=str, default="default_exp", help="Experiment name for logging")
     args = parser.parse_args()
     return args
-# =================================
+
 
 def main():
-    # ====== 新增: 解析命令行参数 ======
     args = parse_args()
-    # 更新 config.py 中的默认值（如果命令行传了参数，就覆盖）
     if args.lr is not None:
         config.LEARNING_RATE = args.lr
     if args.batch_size is not None:
@@ -48,9 +45,7 @@ def main():
     if args.print_freq is not None:
         config.PRINT_FREQ = args.print_freq
     exp_name = args.exp_name
-    # =================================
 
-    # 设置随机种子
     set_seed(config.SEED)
 
     # 设备配置
@@ -67,7 +62,7 @@ def main():
     # 初始化模型
     model = get_model(config.NUM_CLASSES).to(device)
 
-    # ====== 新增: 根据 config.OPTIMIZER 判断用哪个优化器 ======
+
     criterion = nn.CrossEntropyLoss()
     if getattr(config, "OPTIMIZER", "sgd") == "adam":
         optimizer = optim.Adam(
@@ -88,10 +83,8 @@ def main():
 
     best_accuracy = 0.0
 
-    # ====== 新增: TensorBoard SummaryWriter ======
     from torch.utils.tensorboard import SummaryWriter
     writer = SummaryWriter(log_dir=f"runs/{exp_name}")
-    # =================================
 
     for epoch in range(1, config.EPOCHS + 1):
         model.train()
